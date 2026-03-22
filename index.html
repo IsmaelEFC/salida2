@@ -137,14 +137,14 @@
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--accent);
-            ring: 2px solid var(--accent);
+            box-shadow: 0 0 0 2px var(--accent);
             box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
         }
         
-        .btn-primary {
+        .btn-whatsapp {
             width: 100%;
             padding: 16px;
-            background: var(--accent);
+            background: #25D366;
             color: white;
             border: none;
             border-radius: 12px;
@@ -157,11 +157,17 @@
             justify-content: center;
             gap: 8px;
             margin-top: 32px;
+            box-shadow: 0 4px 14px 0 rgba(37, 211, 102, 0.39);
         }
         
-        .btn-primary:hover {
-            background: var(--accent-hover);
+        .btn-whatsapp:hover {
+            background: #128C7E;
             transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.23);
+        }
+
+        .btn-whatsapp:active {
+            transform: translateY(0);
         }
 
         .btn-secondary {
@@ -199,6 +205,75 @@
         .hidden {
             display: none !important;
         }
+
+        /* Toggle Button Group Style */
+        .toggle-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            background: var(--bg-primary);
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .toggle-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .toggle-btn.active {
+            background: var(--bg-card);
+            color: var(--accent);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Icon Input Wrapper */
+        .input-icon-wrapper {
+            position: relative;
+        }
+
+        .input-icon-wrapper input, .input-icon-wrapper select {
+            padding-left: 44px;
+        }
+
+        .input-icon-wrapper i, .input-icon-wrapper .icon-placeholder {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-style: normal;
+        }
+
+        /* Badge for weapons/helmets */
+        .badge-info {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #64748b;
+            margin-top: 4px;
+            display: inline-flex;
+            gap: 4px;
+        }
+        @media (prefers-color-scheme: dark) {
+            .badge-info {
+                background: #334155;
+                color: #cbd5e1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -218,14 +293,18 @@
             <div class="grid-2">
                 <div class="form-group">
                     <label for="fecha">Fecha <span class="required">*</span></label>
-                    <input type="date" id="fecha" required>
+                    <div class="input-icon-wrapper">
+                        <span class="icon-placeholder">📅</span>
+                        <input type="date" id="fecha" required>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="desplazamiento">Desplazamiento <span class="required">*</span></label>
-                    <select id="desplazamiento" required onchange="toggleVehiculo()">
-                        <option value="MOTORIZADO">🚗 Motorizado</option>
-                        <option value="INFANTERIA">🥾 Infantería</option>
-                    </select>
+                    <label>Desplazamiento <span class="required">*</span></label>
+                    <input type="hidden" id="desplazamiento" value="MOTORIZADO">
+                    <div class="toggle-group" id="group-desplazamiento">
+                        <button type="button" class="toggle-btn active" onclick="setToggle('desplazamiento', 'MOTORIZADO')">Vehículo</button>
+                        <button type="button" class="toggle-btn" onclick="setToggle('desplazamiento', 'INFANTERIA')">Infantería</button>
+                    </div>
                 </div>
             </div>
 
@@ -236,40 +315,55 @@
                 </div>
                 <div class="form-group">
                     <label for="vehiculo">Seleccionar Vehículo <span class="required">*</span></label>
-                    <select id="vehiculo">
-                        <option value="">Seleccionar vehículo...</option>
-                    </select>
+                    <div class="input-icon-wrapper">
+                        <span class="icon-placeholder">🚗</span>
+                        <select id="vehiculo">
+                            <option value="">Seleccionar vehículo...</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="grid-2">
                     <div class="form-group">
-                        <label for="km">Odómetro</label>
-                        <input type="number" id="km" min="0" placeholder="0">
+                        <label for="km">Kilometraje Actual</label>
+                        <div class="input-icon-wrapper">
+                            <span class="icon-placeholder">🔢</span>
+                            <input type="number" id="km" min="0" placeholder="Ej: 45000">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="tarjeta-combustible">Tarjeta Combustible</label>
-                        <select id="tarjeta-combustible">
-                            <option value="NO">❌ NO</option>
-                            <option value="SI">✅ SI</option>
-                        </select>
+                        <label>Tarjeta Combustible</label>
+                        <input type="hidden" id="tarjeta-combustible" value="NO">
+                        <div class="toggle-group" id="group-tarjeta">
+                            <button type="button" class="toggle-btn active" onclick="setToggle('tarjeta-combustible', 'NO')">✖️ NO</button>
+                            <button type="button" class="toggle-btn" onclick="setToggle('tarjeta-combustible', 'SI')">✔️ SI</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- SECCIÓN: PERSONAL -->
             <div class="section-title">
-                <span>👤</span> Personal de Servicio
+                <span>👨</span> Personal de Servicio
             </div>
             
             <div class="form-group">
                 <label for="jp">Jefe de Patrulla <span class="required">*</span></label>
-                <input type="text" id="jp" list="funcionarios" required placeholder="Grado y Nombre" onchange="autocompletarArmamento('jp')" onfocus="this.select()">
+                <div class="input-icon-wrapper">
+                    <span class="icon-placeholder">🕵️</span>
+                    <input type="text" id="jp" list="funcionarios" required placeholder="Grado y Nombre" onchange="autocompletarArmamento('jp')" onfocus="this.select()">
+                </div>
+                <div id="jp-info" class="badge-info hidden"></div>
                 <input type="hidden" id="jp-armamento">
                 <input type="hidden" id="jp-casco">
             </div>
             
             <div class="form-group">
                 <label for="acomp1">Acompañante 1 <span class="required">*</span></label>
-                <input type="text" id="acomp1" list="funcionarios" required placeholder="Grado y Nombre" onchange="autocompletarArmamento('acomp1')" onfocus="this.select()">
+                <div class="input-icon-wrapper">
+                    <span class="icon-placeholder">🕵️</span>
+                    <input type="text" id="acomp1" list="funcionarios" required placeholder="Grado y Nombre" onchange="autocompletarArmamento('acomp1')" onfocus="this.select()">
+                </div>
+                <div id="acomp1-info" class="badge-info hidden"></div>
                 <input type="hidden" id="acomp1-armamento">
                 <input type="hidden" id="acomp1-casco">
             </div>
@@ -287,23 +381,28 @@
 
             <div class="form-group">
                 <label for="radio">Equipo Radial</label>
-                <input type="text" id="radio" list="radiales" placeholder="Seleccionar radio...">
+                <div class="input-icon-wrapper">
+                    <span class="icon-placeholder">📻</span>
+                    <input type="text" id="radio" list="radiales" placeholder="Seleccionar radio...">
+                </div>
             </div>
 
             <div class="grid-2">
                 <div class="form-group">
-                    <label for="accesorios">Accesorios</label>
-                    <select id="accesorios" onchange="mostrarCampoSerie()">
-                        <option value="NO">❌ NO</option>
-                        <option value="SI">✅ SI</option>
-                    </select>
+                    <label>Accesorios</label>
+                    <input type="hidden" id="accesorios" value="NO">
+                    <div class="toggle-group" id="group-accesorios">
+                        <button type="button" class="toggle-btn active" onclick="setToggle('accesorios', 'NO')">✖️ NO</button>
+                        <button type="button" class="toggle-btn" onclick="setToggle('accesorios', 'SI')">✔️ SI</button>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="equipamiento">Equipamiento Completo</label>
-                    <select id="equipamiento" onchange="mostrarCamposEquipamiento()">
-                        <option value="No">❌ NO</option>
-                        <option value="Sí">✅ SI</option>
-                    </select>
+                    <label>Equipamiento Completo</label>
+                    <input type="hidden" id="equipamiento" value="No">
+                    <div class="toggle-group" id="group-equipamiento">
+                        <button type="button" class="toggle-btn active" onclick="setToggle('equipamiento', 'No')">✖️ NO</button>
+                        <button type="button" class="toggle-btn" onclick="setToggle('equipamiento', 'Sí')">✔️ SI</button>
+                    </div>
                 </div>
             </div>
 
@@ -349,7 +448,7 @@
                 <textarea id="obs" rows="3" placeholder="Información adicional..."></textarea>
             </div>
 
-            <button type="button" class="btn-primary" onclick="enviarWhatsApp()">
+            <button type="button" class="btn-whatsapp" onclick="enviarWhatsApp()">
                 <span>📲</span> ENVIAR POR WHATSAPP
             </button>
         </form>
