@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Salidas</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#004080">
+    
+    <!-- PWA: Iconos -->
+    <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="images/icon-512.png" />
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+    
+    <!-- PWA: Apple -->
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+    <meta name="apple-mobile-web-app-title" content="Control de Salidas">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Tema Claro (por defecto) */
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --accent: #1e40af;
+            --accent-hover: #1d4ed8;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Tema Oscuro */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0f172a;
+                --bg-card: #1e293b;
+                --accent: #3b82f6;
+                --accent-hover: #60a5fa;
+                --text-primary: #f8fafc;
+                --text-secondary: #94a3b8;
+                --border-color: #334155;
+                --input-bg: #0f172a;
+                --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px 10px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 32px;
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .logo-img {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 16px;
+            border-radius: 20px;
+            object-fit: contain;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            margin: 32px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 16px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            ring: 2px solid var(--accent);
+            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 32px;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="images/logo2.png" alt="Logo" class="logo-img" onerror="this.style.display='none';">
+            <h1>Control de Salidas</h1>
+            <p class="subtitle">Sección OS9 Araucanía</p>
+        </div>
+
+        <form id="salidaForm">
+            <!-- SECCIÓN: GENERAL -->
+            <div class="section-title">
+                <span>📋</span> Información General
+            </div>
+            
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="fecha">Fecha <span class="required">*</span></label>
+                    <input type="date" id="fecha" required>
+                </div>
+                <div class="form-group">
+                    <label for="desplazamiento">Desplazamiento <span class="required">*</span></label>
+                    <select id="desplazamiento" required onchange="toggleVehiculo()">
+                        <option value="MOTORIZADO">🚗 Motorizado</option>
+                        <option value="INFANTERIA">🥾 Infantería</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: VEHÍCULO (Solo si es MOTORIZADO) -->
+            <div id="section-vehiculo">
+                <div class="section-title">
+                    <span>🚘</span> Vehículo
+                </div>
+                <div class="form-group">
+                    <label for="vehiculo">Seleccionar Vehículo <span class="required">*</span></label>
+                    <select id="vehiculo">
+                        <option value="">Seleccionar vehículo...</option>
+                    </select>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="km">Odómetro</label>
+                        <input type="number" id="km" min="0" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="tarjeta-combustible">Tarjeta Combustible</label>
+                        <select id="tarjeta-combustible">
+                            <option value="NO">❌ NO</option>
+                            <option value="SI">✅ SI</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: PERSONAL -->
+            <div class="section-title">
+                <span>👤</span> Personal de Servicio
+            </div>
+            
+            <div class="form-group">
+                <label for="jp">Jefe de Patrulla <span class="required">*</span></label>
+                <input type="text" id="jp" list="funcionarios" required placeholder="Grado y Nombre" onchange="autocompletarArmamento('jp')" onfocus="this.select()">
+                <input type="hidden" id="jp-armamento">
+                <input type="hidden" id="jp-casco">
+            </div>
+            
+            <div class="form-group">
+                <label for="acomp1">Acompañante 1 <span class="required">*</span></label>
+                <input type="text" id="acomp1" list="funcionarios" required placeholder="Grado y Nombre" onchange="autocompletarArmamento('acomp1')" onfocus="this.select()">
+                <input type="hidden" id="acomp1-armamento">
+                <input type="hidden" id="acomp1-casco">
+            </div>
+            
+            <div id="acompanantes-adicionales"></div>
+            
+            <button type="button" class="btn-secondary" id="btn-agregar-acomp" onclick="agregarAcompanante()">
+                ➕ Añadir Acompañante
+            </button>
+
+            <!-- SECCIÓN: EQUIPAMIENTO -->
+            <div class="section-title">
+                <span>🛡️</span> Equipamiento y Radio
+            </div>
+
+            <div class="form-group">
+                <label for="radio">Equipo Radial</label>
+                <input type="text" id="radio" list="radiales" placeholder="Seleccionar radio...">
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="accesorios">Accesorios</label>
+                    <select id="accesorios" onchange="mostrarCampoSerie()">
+                        <option value="NO">❌ NO</option>
+                        <option value="SI">✅ SI</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="equipamiento">Equipamiento Completo</label>
+                    <select id="equipamiento" onchange="mostrarCamposEquipamiento()">
+                        <option value="No">❌ NO</option>
+                        <option value="Sí">✅ SI</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="grupo-accesorios" class="hidden">
+                <div class="form-group">
+                    <label for="accesorio-select">Seleccionar Accesorio</label>
+                    <select id="accesorio-select" onchange="mostrarCampoManualAccesorio()">
+                        <option value="">Seleccionar accesorio...</option>
+                    </select>
+                </div>
+                <div id="manual-accesorio-group" class="form-group hidden">
+                    <label for="manual-accesorio">Nombre del Accesorio</label>
+                    <input type="text" id="manual-accesorio" placeholder="Describa el accesorio">
+                </div>
+            </div>
+
+            <div id="campos-equipamiento" class="hidden">
+                <div id="equipamiento-completo">
+                    <div class="form-group">
+                        <label for="chaleco-jp">Chaleco - Jefe de Patrulla</label>
+                        <input type="text" id="chaleco-jp" placeholder="Ej: CH-001">
+                    </div>
+                    <div class="form-group">
+                        <label for="chaleco-acomp1">Chaleco - Acompañante 1</label>
+                        <input type="text" id="chaleco-acomp1" placeholder="Ej: CH-002">
+                    </div>
+                    <div id="chalecos-adicionales"></div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: SERVICIO -->
+            <div class="section-title">
+                <span>📝</span> Detalles del Servicio
+            </div>
+
+            <div class="form-group">
+                <label for="tipo">Tipo de Servicio <span class="required">*</span></label>
+                <input type="text" id="tipo" list="tipos-servicio" required placeholder="Ej: P.P.F.F.">
+            </div>
+
+            <div class="form-group">
+                <label for="obs">Observaciones</label>
+                <textarea id="obs" rows="3" placeholder="Información adicional..."></textarea>
+            </div>
+
+            <button type="button" class="btn-primary" onclick="enviarWhatsApp()">
+                <span>📲</span> ENVIAR POR WHATSAPP
+            </button>
+        </form>
+    </div>
+
+    <!-- DATALISTS MANTENIDOS -->
+    <datalist id="funcionarios"></datalist>
+    <datalist id="radiales"></datalist>
+    <datalist id="accesorios-list"></datalist>
+    <datalist id="tipos-servicio"></datalist>
+    <datalist id="observaciones"></datalist>
+
+    <script src="app.js"></script>
+    <script>
+        // Inline setup for date
+        const f = new Date();
+        document.getElementById('fecha').value = `${f.getFullYear()}-${String(f.getMonth() + 1).padStart(2, '0')}-${String(f.getDate()).padStart(2, '0')}`;
+    </script>
+</body>
+</html>
