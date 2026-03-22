@@ -237,10 +237,12 @@ function enviarWhatsApp() {
     const tipo = document.getElementById("tipo").value;
     const obs = document.getElementById("obs").value;
     
-    let mensaje = `*SALIDA SERVICIO DEL PERSONAL*\n`;
+    let mensaje = `*🐺 SALIDA PERSONAL SERVICIO 🐺*\n`;
     mensaje += `\n`;
     mensaje += `*Fecha:* ${fechaFormateada}\n`;
-    mensaje += `*Modo:* ${desplazamiento === 'INFANTERIA' ? 'INFANTERÍA' : 'MOTORIZADO'}\n`;
+    if (desplazamiento === 'INFANTERIA') {
+        mensaje += `*Modo:* INFANTERÍA\n`;
+    }
     
     if (desplazamiento === 'MOTORIZADO') {
         const vehiculoCompleto = document.getElementById("vehiculo").value;
