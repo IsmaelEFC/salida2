@@ -340,7 +340,7 @@ function enviarWhatsApp() {
     if (obs) mensaje += `*Obs:* ${obs}\n`;
     
     mensaje += `\n`;
-    mensaje += `_🐺Sección OS9 Araucanía🐺_`;
+    mensaje += `_Sección OS9 Araucanía 2026_`;
 
     window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, "_blank");
 }
