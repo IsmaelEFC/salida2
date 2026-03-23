@@ -317,9 +317,16 @@
                     <label for="vehiculo">Seleccionar Vehículo <span class="required">*</span></label>
                     <div class="input-icon-wrapper">
                         <span class="icon-placeholder">🚗</span>
-                        <select id="vehiculo">
+                        <select id="vehiculo" onchange="mostrarCampoManualVehiculo()">
                             <option value="">Seleccionar vehículo...</option>
                         </select>
+                    </div>
+                </div>
+                <div id="manual-vehiculo-group" class="form-group hidden">
+                    <label for="manual-vehiculo">Ingresar Vehículo Manual</label>
+                    <div class="input-icon-wrapper">
+                        <span class="icon-placeholder">✍️</span>
+                        <input type="text" id="manual-vehiculo" placeholder="Ej: AP-2167">
                     </div>
                 </div>
                 <div class="grid-2">

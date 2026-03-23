@@ -31,6 +31,12 @@ async function cargarVehiculos() {
             option.textContent = valorCompleto;
             select.appendChild(option);
         });
+
+        // Agregar opción para ingreso manual
+        const manualOption = document.createElement('option');
+        manualOption.value = 'MANUAL';
+        manualOption.textContent = 'OTRO (Ingreso manual)';
+        select.appendChild(manualOption);
     } catch (error) {
         console.error('Error al cargar vehículos:', error);
         // Fallback: agregar un vehículo de prueba
@@ -109,6 +115,18 @@ function setFechaActual() {
     fechaInput.value = fechaFormateada;
 }
 
+function mostrarCampoManualVehiculo() {
+    const vehiculoSelect = document.getElementById('vehiculo');
+    const manualVehiculoGroup = document.getElementById('manual-vehiculo-group');
+
+    if (vehiculoSelect.value === 'MANUAL') {
+        manualVehiculoGroup.classList.remove('hidden');
+    } else {
+        manualVehiculoGroup.classList.add('hidden');
+        document.getElementById('manual-vehiculo').value = '';
+    }
+}
+
 function setToggle(id, value) {
     const input = document.getElementById(id);
     if (!input) return;
@@ -144,6 +162,7 @@ function toggleVehiculo() {
         if (vehiculoSelect) {
             vehiculoSelect.removeAttribute('required');
             vehiculoSelect.value = '';
+            mostrarCampoManualVehiculo(); // Ocultar campo manual
         }
     } else {
         sectionVehiculo.classList.remove('hidden');
@@ -201,7 +220,17 @@ function validarFormulario() {
     const campos = ['fecha', 'jp', 'acomp1', 'tipo'];
     
     if (desplazamiento === 'MOTORIZADO') {
-        campos.push('vehiculo');
+        const vehiculoSelect = document.getElementById('vehiculo');
+        if (vehiculoSelect && !vehiculoSelect.value.trim()) {
+            vehiculoSelect.style.borderColor = '#ef4444';
+            isValid = false;
+        } else if (vehiculoSelect && vehiculoSelect.value === 'MANUAL') {
+            const manualVehiculo = document.getElementById('manual-vehiculo');
+            if (manualVehiculo && !manualVehiculo.value.trim()) {
+                manualVehiculo.style.borderColor = '#ef4444';
+                isValid = false;
+            }
+        }
     }
     
     document.querySelectorAll('input, select').forEach(el => el.style.borderColor = '');
@@ -245,10 +274,12 @@ function enviarWhatsApp() {
     }
     
     if (desplazamiento === 'MOTORIZADO') {
-        const vehiculoCompleto = document.getElementById("vehiculo").value;
+        const vehiculoSelect = document.getElementById("vehiculo").value;
+        const manualVehiculo = document.getElementById("manual-vehiculo").value.trim();
         const km = document.getElementById("km").value;
         const tarjeta = document.getElementById("tarjeta-combustible").value;
         
+        let vehiculoCompleto = vehiculoSelect === 'MANUAL' ? manualVehiculo : vehiculoSelect;
         let vehiculoCodigo = vehiculoCompleto;
         let vehiculoPatente = '';
         if (vehiculoCompleto.includes(' - ')) {
