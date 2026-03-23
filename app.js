@@ -237,7 +237,7 @@ function enviarWhatsApp() {
     const tipo = document.getElementById("tipo").value;
     const obs = document.getElementById("obs").value;
     
-    let mensaje = `*🐺 SALIDA PERSONAL SERVICIO 🐺*\n`;
+    let mensaje = `*SALIDA OS9*\n`;
     mensaje += `\n`;
     mensaje += `*Fecha:* ${fechaFormateada}\n`;
     if (desplazamiento === 'INFANTERIA') {
@@ -309,7 +309,7 @@ function enviarWhatsApp() {
     if (obs) mensaje += `*Obs:* ${obs}\n`;
     
     mensaje += `\n`;
-    mensaje += `_Sección OS9 Araucanía_`;
+    mensaje += `_🐺Sección OS9 Araucanía🐺_`;
 
     window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, "_blank");
 }
