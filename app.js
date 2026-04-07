@@ -219,6 +219,16 @@ function validarFormulario() {
     const desplazamiento = document.getElementById('desplazamiento').value;
     const campos = ['fecha', 'jp', 'acomp1', 'tipo'];
     
+    document.querySelectorAll('input, select, textarea').forEach(el => el.style.borderColor = '');
+    
+    campos.forEach(campo => {
+        const input = document.getElementById(campo);
+        if (input && !input.value.trim()) {
+            input.style.borderColor = '#ef4444';
+            isValid = false;
+        }
+    });
+
     if (desplazamiento === 'MOTORIZADO') {
         const vehiculoSelect = document.getElementById('vehiculo');
         if (vehiculoSelect && !vehiculoSelect.value.trim()) {
@@ -231,17 +241,13 @@ function validarFormulario() {
                 isValid = false;
             }
         }
-    }
-    
-    document.querySelectorAll('input, select').forEach(el => el.style.borderColor = '');
-    
-    campos.forEach(campo => {
-        const input = document.getElementById(campo);
-        if (input && !input.value.trim()) {
-            input.style.borderColor = '#ef4444';
+
+        const kmInput = document.getElementById('km');
+        if (kmInput && !String(kmInput.value).trim()) {
+            kmInput.style.borderColor = '#ef4444';
             isValid = false;
         }
-    });
+    }
     
     if (!isValid) {
         alert('Por favor, complete los campos obligatorios marcados en rojo.');
