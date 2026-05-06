@@ -1,0 +1,4 @@
+- [ ] Investigar la lógica detrás del servicio de trabajo (service-worker.js) y asegurarme de que funciona correctamente.
+- [ ] Analizar los archivos de imágenes (favicon.ico, icon-192.png, etc.) y asegurarme de que están optimizados para la mejor carga.
+- [ ] Agregar la posibilidad de ingreso de nuevos acompañantes que no estén en el listado.
+- [ ] Implementar un formulario manual para sumar acompañantes o JP.
