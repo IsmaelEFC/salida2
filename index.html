@@ -596,7 +596,22 @@
     <datalist id="tipos-servicio"></datalist>
     <datalist id="observaciones"></datalist>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=3.0"></script>
+    <script>
+        // Verificar que las funciones estén cargadas
+        console.log('Verificando funciones...');
+        console.log('agregarRadioAdicional:', typeof agregarRadioAdicional);
+        console.log('toggleExternoMode:', typeof toggleExternoMode);
+        console.log('contadorRadios:', typeof contadorRadios !== 'undefined' ? contadorRadios : 'undefined');
+        
+        // Forzar recarga si las funciones no están disponibles
+        if (typeof agregarRadioAdicional === 'undefined' || typeof toggleExternoMode === 'undefined') {
+            console.error('Funciones no cargadas, forzando recarga...');
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 1000);
+        }
+    </script>
     <script>
         const f = new Date();
         document.getElementById('fecha').value =

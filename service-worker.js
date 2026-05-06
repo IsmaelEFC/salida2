@@ -1,4 +1,4 @@
-const CACHE_NAME = "salidas-cache-v2.1"; // Incrementar versión en cada actualización importante
+const CACHE_NAME = "salidas-cache-v3.0"; // Incrementar versión para forzar actualización
 const urlsToCache = [
   "/",
   "/index.html",
