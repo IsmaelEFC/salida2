@@ -194,7 +194,7 @@ function toggleExternoMode(inputId) {
       input.placeholder = "Ingresar radio manualmente...";
       input.value = "";
       input.classList.add("modo-externo");
-      if (btn) { btn.textContent = "✍️ Externo"; btn.classList.add("activo"); }
+      if (btn) { btn.textContent = "Externo"; btn.classList.add("activo"); }
       if (externoBadge) externoBadge.classList.remove("hidden");
       input.focus();
     }
@@ -232,7 +232,7 @@ function toggleExternoMode(inputId) {
       input.placeholder = "Nombre completo (externo)";
       input.value = "";
       input.classList.add("modo-externo");
-      if (btn) { btn.textContent = "✍️ Externo"; btn.classList.add("activo"); }
+      if (btn) { btn.textContent = "Externo"; btn.classList.add("activo"); }
       if (infoBadge) infoBadge.classList.add("hidden");
       if (externoBadge) externoBadge.classList.remove("hidden");
       if (externoCampos) externoCampos.classList.remove("hidden");
@@ -275,7 +275,7 @@ function autocompletarArmamento(inputId) {
       if (cascoInput) cascoInput.value = casco || "";
 
       if (infoBadge) {
-        infoBadge.innerHTML = `<span>🔫 ${armamento || "Sin arma"}</span><span>🪖 ${casco || "Sin casco"}</span>`;
+        infoBadge.innerHTML = `<span>Armamento: ${armamento || "Sin arma"}</span><span>Casco: ${casco || "Sin casco"}</span>`;
         infoBadge.classList.remove("hidden");
       }
 
@@ -312,12 +312,12 @@ function agregarRadioAdicional() {
       <input type="text" id="radio${n}" list="radiales" placeholder="Seleccionar radio...">
       <button type="button" class="btn-externo" id="btn-externo-radio${n}"
         onclick="toggleExternoMode('radio${n}')" title="Ingresar radio manualmente">
-        📋 Listado
+        Listado
       </button>
       <button type="button" class="btn-danger" onclick="eliminarRadioAdicional(${n})"
-        style="padding: 10px 12px;" title="Eliminar radio">✕</button>
+        style="padding: 10px 12px;" title="Eliminar radio">×</button>
     </div>
-    <div id="radio${n}-externo-badge" class="badge-externo hidden">⚠️ Radio ingresado manualmente</div>
+    <div id="radio${n}-externo-badge" class="badge-externo hidden">Radio ingresado manualmente</div>
     <input type="hidden" id="radio${n}-externo" value="NO">
   `;
 
@@ -349,13 +349,13 @@ function agregarAcompanante() {
           onchange="autocompletarArmamento('acomp${n}')" onfocus="this.select()">
         <button type="button" class="btn-externo" id="btn-externo-acomp${n}"
           onclick="toggleExternoMode('acomp${n}')" title="Marcar como personal externo al listado">
-          📋 Listado
+          Listado
         </button>
         <button type="button" class="btn-danger" onclick="eliminarAcompanante(${n})"
-          style="padding: 10px 12px;" title="Eliminar acompañante">✕</button>
+          style="padding: 10px 12px;" title="Eliminar acompañante">×</button>
       </div>
       <div id="acomp${n}-info" class="badge-info hidden"></div>
-      <div id="acomp${n}-externo-badge" class="badge-externo hidden">⚠️ Personal externo al listado</div>
+      <div id="acomp${n}-externo-badge" class="badge-externo hidden">Personal externo al listado</div>
       
       <!-- Campos para personal externo -->
       <div id="acomp${n}-externo-campos" class="hidden">
