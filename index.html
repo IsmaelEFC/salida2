@@ -417,7 +417,7 @@
             <p class="subtitle">Sección OS9 Araucanía</p>
         </div>
 
-        <form id="salidaForm">
+        <form id="salidaForm" novalidate>
             <!-- SECCIÓN: GENERAL -->
             <div class="section-title">
                 Información General
@@ -517,10 +517,10 @@
 
             <!-- Acompañante 1 -->
             <div class="form-group">
-                <label for="acomp1">Acompañante 1 <span class="required">*</span></label>
+                <label for="acomp1">Acompañante 1</label>
                 <div class="input-row">
-                    <input type="text" id="acomp1" list="funcionarios" required placeholder="Grado y Nombre"
-                        onchange="autocompletarArmamento('acomp1')" onfocus="this.select()">
+                    <input type="text" id="acomp1" list="funcionarios" placeholder="Grado y Nombre"
+                        onchange="autocompletarArmamento('acomp1'); toggleChalecoAcomp1()" onfocus="this.select()" oninput="toggleChalecoAcomp1()">
                     <button type="button" class="btn-externo" id="btn-externo-acomp1"
                         onclick="toggleExternoMode('acomp1')" title="Marcar como personal externo al listado">
                         Listado
@@ -566,7 +566,7 @@
             <div class="form-group">
                 <label for="radio">Equipo Radial</label>
                 <div class="input-row">
-                    <input type="text" id="radio" list="radiales" placeholder="Seleccionar radio..." onchange="mostrarCampoManualRadio()">
+                    <input type="text" id="radio" list="radiales" placeholder="Seleccionar radio...">
                     <button type="button" class="btn-externo" id="btn-externo-radio"
                         onclick="toggleExternoMode('radio')" title="Ingresar radio manualmente">
                         Listado
@@ -620,11 +620,11 @@
 
             <div id="campos-equipamiento" class="hidden">
                 <div id="equipamiento-completo">
-                    <div class="form-group">
+                    <div class="form-group" id="grupo-chaleco-jp-equip">
                         <label for="chaleco-jp">Chaleco - Jefe de Patrulla</label>
                         <input type="text" id="chaleco-jp" placeholder="Ej: CH-001">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="grupo-chaleco-acomp1">
                         <label for="chaleco-acomp1">Chaleco - Acompañante 1</label>
                         <input type="text" id="chaleco-acomp1" placeholder="Ej: CH-002">
                     </div>
@@ -660,7 +660,7 @@
     <datalist id="tipos-servicio"></datalist>
     <datalist id="observaciones"></datalist>
 
-    <script src="app.js?v=3.0"></script>
+    <script src="app.js?v=4.3"></script>
     <script>
         // Verificar que las funciones estén cargadas
         console.log('Verificando funciones...');

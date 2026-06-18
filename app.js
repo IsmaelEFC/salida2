@@ -244,6 +244,10 @@ function toggleExternoMode(inputId) {
       // Foco en el input
       input.focus();
     }
+    // Sincronizar chaleco JP en equipamiento según modo externo
+    if (inputId === 'jp' && document.getElementById("equipamiento").value === "Sí") {
+      mostrarChalecosExternos();
+    }
   }
 }
 
@@ -413,7 +417,7 @@ function validarFormulario() {
   });
 
   // Campos siempre requeridos
-  const camposRequeridos = ["fecha", "jp", "acomp1", "tipo"];
+  const camposRequeridos = ["fecha", "jp", "tipo"];
   camposRequeridos.forEach((campo) => {
     const input = document.getElementById(campo);
     if (input && !input.value.trim()) {
@@ -677,6 +681,19 @@ function obtenerSerieDelAccesorio(valorAccesorio) {
 // EQUIPAMIENTO COMPLETO (chalecos)
 // ─────────────────────────────────────────────
 
+function toggleChalecoAcomp1() {
+  const grupo = document.getElementById("grupo-chaleco-acomp1");
+  const acomp1 = document.getElementById("acomp1");
+  const equipamiento = document.getElementById("equipamiento").value;
+  if (!grupo || !acomp1) return;
+
+  if (equipamiento === "Sí" && acomp1.value.trim()) {
+    grupo.classList.remove("hidden");
+  } else {
+    grupo.classList.add("hidden");
+  }
+}
+
 function mostrarCamposEquipamiento() {
   const equipamiento = document.getElementById("equipamiento").value;
   const camposEquipamiento = document.getElementById("campos-equipamiento");
@@ -686,6 +703,7 @@ function mostrarCamposEquipamiento() {
     sincronizarChalecos();
     // Mostrar campos de chaleco para personal externo
     mostrarChalecosExternos();
+    toggleChalecoAcomp1();
   } else {
     camposEquipamiento.classList.add("hidden");
     limpiarCamposChalecos();
@@ -695,11 +713,15 @@ function mostrarCamposEquipamiento() {
 }
 
 function mostrarChalecosExternos() {
-  // Mostrar campos de chaleco para JP si es externo
+  // JP externo: ocultar chaleco-jp del equipamiento (ya está en jp-chaleco-manual)
   const jpExterno = document.getElementById("jp-externo").value === "SI";
+  const grupoJpEquip = document.getElementById("grupo-chaleco-jp-equip");
   if (jpExterno) {
     const jpChalecoGroup = document.getElementById("jp-chaleco-group");
     if (jpChalecoGroup) jpChalecoGroup.classList.remove("hidden");
+    if (grupoJpEquip) grupoJpEquip.classList.add("hidden");
+  } else {
+    if (grupoJpEquip) grupoJpEquip.classList.remove("hidden");
   }
   
   // Mostrar campos de chaleco para Acompañante 1 si es externo
