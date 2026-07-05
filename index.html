@@ -504,7 +504,7 @@
                             <input type="text" id="jp-casco-manual" placeholder="Ej: 71900">
                         </div>
                     </div>
-                    <div class="form-group" id="jp-chaleco-group" class="hidden">
+                    <div class="form-group hidden" id="jp-chaleco-group">
                         <label for="jp-chaleco-manual">Chaleco</label>
                         <input type="text" id="jp-chaleco-manual" placeholder="Ej: CH-001">
                     </div>
@@ -541,7 +541,7 @@
                             <input type="text" id="acomp1-casco-manual" placeholder="Ej: 71900">
                         </div>
                     </div>
-                    <div class="form-group" id="acomp1-chaleco-group" class="hidden">
+                    <div class="form-group hidden" id="acomp1-chaleco-group">
                         <label for="acomp1-chaleco-manual">Chaleco</label>
                         <input type="text" id="acomp1-chaleco-manual" placeholder="Ej: CH-002">
                     </div>
@@ -658,7 +658,7 @@
     <datalist id="radiales"></datalist>
     <datalist id="accesorios-list"></datalist>
     <datalist id="tipos-servicio"></datalist>
-    <datalist id="observaciones"></datalist>
+
 
     <script src="app.js?v=4.3"></script>
     <script>
@@ -677,12 +677,6 @@
         }
     </script>
     <script>
-        const f = new Date();
-        document.getElementById('fecha').value =
-            `${f.getFullYear()}-${String(f.getMonth() + 1).padStart(2, '0')}-${String(f.getDate()).padStart(2, '0')}`;
-    </script>
-    
-    <script>
         // Service Worker Registration y Update Detection
         if ('serviceWorker' in navigator) {
             let refreshing = false;
@@ -696,7 +690,7 @@
             });
             
             // Registrar el service worker
-            navigator.serviceWorker.register('/service-worker.js')
+            navigator.serviceWorker.register('service-worker.js')
                 .then(registration => {
                     console.log('Service Worker registrado con éxito:', registration);
                     

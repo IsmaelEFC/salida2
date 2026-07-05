@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
   cargarFuncionarios();
   cargarRadiales();
   cargarTiposServicio();
-  cargarObservaciones();
   setFechaActual();
 
   setTimeout(() => {
@@ -48,6 +47,17 @@ async function cargarVehiculos() {
   }
 }
 
+const ORDEN_GRADOS = {
+  "Tte. Crl.": 1,
+  "Capitán": 2,
+  "Teniente": 3,
+  "S.O.M": 4,
+  "Suboficial": 5,
+  "Sgto. 1°": 6,
+  "Sgto. 2°": 7,
+  "Cabo 1°": 8,
+};
+
 async function cargarFuncionarios() {
   try {
     const response = await fetch("listado_funcionarios.json");
@@ -55,13 +65,15 @@ async function cargarFuncionarios() {
     const funcionarios = await response.json();
     const datalist = document.getElementById("funcionarios");
 
-    funcionarios.forEach((funcionario) => {
-      const option = document.createElement("option");
-      option.value = `${funcionario.grado} ${funcionario.nombre}`;
-      option.setAttribute("data-armamento", funcionario.armamento || "");
-      option.setAttribute("data-casco", funcionario.casco || "");
-      datalist.appendChild(option);
-    });
+    funcionarios
+      .sort((a, b) => (ORDEN_GRADOS[a.grado] || 99) - (ORDEN_GRADOS[b.grado] || 99))
+      .forEach((funcionario) => {
+        const option = document.createElement("option");
+        option.value = `${funcionario.grado} ${funcionario.nombre}`;
+        option.setAttribute("data-armamento", funcionario.armamento || "");
+        option.setAttribute("data-casco", funcionario.casco || "");
+        datalist.appendChild(option);
+      });
   } catch (error) {
     console.error("Error al cargar funcionarios:", error);
   }
@@ -373,7 +385,7 @@ function agregarAcompanante() {
             <input type="text" id="acomp${n}-casco-manual" placeholder="Ej: 71900">
           </div>
         </div>
-        <div class="form-group" id="acomp${n}-chaleco-group" class="hidden">
+        <div class="form-group hidden" id="acomp${n}-chaleco-group">
           <label for="acomp${n}-chaleco-manual">Chaleco</label>
           <input type="text" id="acomp${n}-chaleco-manual" placeholder="Ej: CH-${String(n + 1).padStart(3, "0")}">
         </div>
@@ -469,7 +481,7 @@ function enviarWhatsApp() {
   const jp = document.getElementById("jp").value;
   const jpArmamento = document.getElementById("jp-armamento").value;
   const jpCasco = document.getElementById("jp-casco").value;
-  const jpChaleco = document.getElementById("chaleco-jp").value;
+  const jpChaleco = document.getElementById("chaleco-jp")?.value || "";
   const jpExterno = document.getElementById("jp-externo").value === "SI";
   const equipamiento = document.getElementById("equipamiento").value;
   const tipo = document.getElementById("tipo").value;
@@ -601,11 +613,10 @@ function enviarWhatsApp() {
 
   mensaje += `\n*Servicio:* ${tipo}\n`;
   if (obs) mensaje += `*Obs:* ${obs}\n`;
-  mensaje += `\n_Sección OS9 Araucanía 2026_`;
+  mensaje += `\n_Sección OS9 Araucanía ${new Date().getFullYear()}_`;
 
-  // Guardar tipo de servicio y observación para autocompletar futuro
+  // Guardar tipo de servicio para autocompletar futuro
   guardarTipoServicio(tipo);
-  if (obs) guardarObservacion(obs);
 
   window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, "_blank");
 }
@@ -801,27 +812,5 @@ function guardarTipoServicio(tipo) {
     if (tipos.length > 20) tipos = tipos.slice(0, 20);
     localStorage.setItem("tiposServicio", JSON.stringify(tipos));
     cargarTiposServicio();
-  }
-}
-
-function cargarObservaciones() {
-  const observaciones = JSON.parse(localStorage.getItem("observaciones") || "[]");
-  const datalist = document.getElementById("observaciones");
-  datalist.innerHTML = "";
-  observaciones.forEach((obs) => {
-    const option = document.createElement("option");
-    option.value = obs;
-    datalist.appendChild(option);
-  });
-}
-
-function guardarObservacion(observacion) {
-  if (!observacion.trim()) return;
-  let observaciones = JSON.parse(localStorage.getItem("observaciones") || "[]");
-  if (!observaciones.includes(observacion.trim())) {
-    observaciones.unshift(observacion.trim());
-    if (observaciones.length > 15) observaciones = observaciones.slice(0, 15);
-    localStorage.setItem("observaciones", JSON.stringify(observaciones));
-    cargarObservaciones();
   }
 }
