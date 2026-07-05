@@ -406,10 +406,123 @@
         .input-row select {
             flex: 1;
         }
+
+        /* ── Loading Overlay ── */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Modal de Previsualización ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 28px;
+            max-width: 520px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
+        .modal-content h3 {
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        .modal-body {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 16px;
+            font-family: 'SF Mono', 'Consolas', 'Menlo', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin-bottom: 20px;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .modal-actions .btn-whatsapp { margin-top: 0; }
+        .modal-actions .btn-secondary { margin-bottom: 0; }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        .toast.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ── Historial ── */
+        .historial-panel {
+            margin-top: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            max-height: 320px;
+            overflow-y: auto;
+            background: var(--bg-card);
+        }
+        .historial-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .historial-item:last-child { border-bottom: none; }
+        .historial-item:hover { background: var(--bg-primary); }
+        .historial-fecha { font-size: 12px; color: var(--text-secondary); }
+        .historial-jp { font-weight: 600; font-size: 14px; }
+        .historial-tipo { font-size: 12px; color: var(--accent); font-weight: 500; }
     </style>
 </head>
 
 <body>
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p style="margin-top:16px;color:var(--text-secondary);font-size:14px;">Cargando datos...</p>
+    </div>
     <div class="container">
         <div class="header">
             <img src="images/logo2.png" alt="Logo" class="logo-img" onerror="this.style.display='none';">
@@ -651,7 +764,31 @@
                 ENVIAR POR WHATSAPP
             </button>
         </form>
+
+        <button type="button" class="btn-secondary btn-historial" onclick="toggleHistorial()">
+            Historial de Salidas
+        </button>
+        <div id="historial-panel" class="historial-panel hidden"></div>
     </div>
+
+    <!-- MODAL PREVISUALIZACIÓN -->
+    <div id="preview-modal" class="modal-overlay hidden" onclick="if(event.target===this)cerrarPreview()">
+        <div class="modal-content">
+            <h3>Vista previa del mensaje</h3>
+            <textarea id="preview-texto" class="modal-body" style="resize:vertical;min-height:200px;" spellcheck="true"></textarea>
+            <div class="modal-actions">
+                <button type="button" class="btn-whatsapp" onclick="confirmarEnvio()">
+                    Enviar por WhatsApp
+                </button>
+                <button type="button" class="btn-secondary" onclick="cerrarPreview()" style="margin-bottom:0;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
 
     <!-- DATALISTS -->
     <datalist id="funcionarios"></datalist>
@@ -660,7 +797,7 @@
     <datalist id="tipos-servicio"></datalist>
 
 
-    <script src="app.js?v=4.3"></script>
+    <script src="app.js?v=4.4"></script>
     <script>
         // Verificar que las funciones estén cargadas
         console.log('Verificando funciones...');

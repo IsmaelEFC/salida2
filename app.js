@@ -1,10 +1,14 @@
 // Cargar datos dinámicamente al iniciar la página
-document.addEventListener("DOMContentLoaded", function () {
-  cargarVehiculos();
-  cargarFuncionarios();
-  cargarRadiales();
+document.addEventListener("DOMContentLoaded", async function () {
+  await Promise.all([
+    cargarVehiculos(),
+    cargarFuncionarios(),
+    cargarRadiales(),
+  ]);
   cargarTiposServicio();
   setFechaActual();
+
+  document.getElementById("loading-overlay").classList.add("hidden");
 
   setTimeout(() => {
     document.getElementById("fecha").focus();
@@ -618,7 +622,22 @@ function enviarWhatsApp() {
   // Guardar tipo de servicio para autocompletar futuro
   guardarTipoServicio(tipo);
 
+  document.getElementById("preview-texto").value = mensaje;
+  document.getElementById("preview-modal").classList.remove("hidden");
+}
+
+function confirmarEnvio() {
+  const mensaje = document.getElementById("preview-texto").value.trim();
+  if (!mensaje) return;
+  guardarHistorial(mensaje);
   window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, "_blank");
+  cerrarPreview();
+  mostrarToast("Salida enviada correctamente");
+}
+
+function cerrarPreview() {
+  document.getElementById("preview-modal").classList.add("hidden");
+  window._mensajePendiente = null;
 }
 
 // ─────────────────────────────────────────────
@@ -793,8 +812,13 @@ function agregarCampoChalecoAdicional(numeroAcompanante) {
 // TIPOS DE SERVICIO Y OBSERVACIONES (localStorage)
 // ─────────────────────────────────────────────
 
+function leerLocalStorage(clave, fallback = "[]") {
+  try { return JSON.parse(localStorage.getItem(clave) || fallback); }
+  catch { return JSON.parse(fallback); }
+}
+
 function cargarTiposServicio() {
-  const tipos = JSON.parse(localStorage.getItem("tiposServicio") || "[]");
+  const tipos = leerLocalStorage("tiposServicio");
   const datalist = document.getElementById("tipos-servicio");
   datalist.innerHTML = "";
   tipos.forEach((tipo) => {
@@ -806,11 +830,77 @@ function cargarTiposServicio() {
 
 function guardarTipoServicio(tipo) {
   if (!tipo.trim()) return;
-  let tipos = JSON.parse(localStorage.getItem("tiposServicio") || "[]");
+  const tipos = leerLocalStorage("tiposServicio");
   if (!tipos.includes(tipo.trim())) {
     tipos.unshift(tipo.trim());
     if (tipos.length > 20) tipos = tipos.slice(0, 20);
     localStorage.setItem("tiposServicio", JSON.stringify(tipos));
     cargarTiposServicio();
   }
+}
+
+// ─────────────────────────────────────────────
+// HISTORIAL DE SALIDAS
+// ─────────────────────────────────────────────
+
+function guardarHistorial(mensaje) {
+  const entrada = {
+    id: Date.now(),
+    timestamp: new Date().toISOString(),
+    fecha: document.getElementById("fecha").value,
+    jp: document.getElementById("jp").value,
+    vehiculo: (document.getElementById("vehiculo")?.value || "").replace("MANUAL", document.getElementById("manual-vehiculo")?.value || ""),
+    tipo: document.getElementById("tipo").value,
+    mensaje,
+  };
+  const historial = leerLocalStorage("historialSalidas");
+  historial.unshift(entrada);
+  if (historial.length > 50) historial.length = 50;
+  localStorage.setItem("historialSalidas", JSON.stringify(historial));
+}
+
+function cargarHistorial() {
+  return leerLocalStorage("historialSalidas");
+}
+
+function toggleHistorial() {
+  const panel = document.getElementById("historial-panel");
+  if (!panel.classList.contains("hidden")) {
+    panel.classList.add("hidden");
+    return;
+  }
+  const entries = cargarHistorial();
+  if (entries.length === 0) {
+    panel.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:20px;">Sin salidas registradas</p>';
+  } else {
+    panel.innerHTML = entries.map(e => `
+      <div class="historial-item" onclick="reenviarSalida(${e.id})">
+        <div class="historial-fecha">${e.fecha}</div>
+        <div class="historial-jp">${e.jp}</div>
+        <div class="historial-tipo">${e.tipo}</div>
+      </div>
+    `).join("");
+  }
+  panel.classList.remove("hidden");
+}
+
+function reenviarSalida(id) {
+  const entries = cargarHistorial();
+  const entry = entries.find(e => e.id === id);
+  if (entry) {
+    window.open(`https://wa.me/?text=${encodeURIComponent(entry.mensaje)}`, "_blank");
+  }
+}
+
+// ─────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────
+
+function mostrarToast(texto) {
+  const el = document.getElementById("toast");
+  if (!el) return;
+  el.textContent = texto;
+  el.classList.add("visible");
+  clearTimeout(el._timeout);
+  el._timeout = setTimeout(() => el.classList.remove("visible"), 3000);
 }
