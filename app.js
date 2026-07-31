@@ -76,6 +76,7 @@ async function cargarFuncionarios() {
         option.value = `${funcionario.grado} ${funcionario.nombre}`;
         option.setAttribute("data-armamento", funcionario.armamento || "");
         option.setAttribute("data-casco", funcionario.casco || "");
+        option.setAttribute("data-chaleco", funcionario.chaleco || "");
         datalist.appendChild(option);
       });
   } catch (error) {
@@ -236,11 +237,13 @@ function toggleExternoMode(inputId) {
       if (infoBadge) infoBadge.classList.add("hidden");
       if (externoBadge) externoBadge.classList.add("hidden");
       if (externoCampos) externoCampos.classList.add("hidden");
-      // Limpiar armamento/casco
+      // Limpiar armamento/casco/chaleco
       const armInput = document.getElementById(`${inputId}-armamento`);
       const cascoInput = document.getElementById(`${inputId}-casco`);
+      const chalecoInput = document.getElementById(`${inputId}-chaleco`);
       if (armInput) armInput.value = "";
       if (cascoInput) cascoInput.value = "";
+      if (chalecoInput) chalecoInput.value = "";
     } else {
       // Activar modo externo
       externoHidden.value = "SI";
@@ -252,11 +255,13 @@ function toggleExternoMode(inputId) {
       if (infoBadge) infoBadge.classList.add("hidden");
       if (externoBadge) externoBadge.classList.remove("hidden");
       if (externoCampos) externoCampos.classList.remove("hidden");
-      // Limpiar armamento/casco
+      // Limpiar armamento/casco/chaleco
       const armInput = document.getElementById(`${inputId}-armamento`);
       const cascoInput = document.getElementById(`${inputId}-casco`);
+      const chalecoInput = document.getElementById(`${inputId}-chaleco`);
       if (armInput) armInput.value = "";
       if (cascoInput) cascoInput.value = "";
+      if (chalecoInput) chalecoInput.value = "";
       // Foco en el input
       input.focus();
     }
@@ -288,14 +293,20 @@ function autocompletarArmamento(inputId) {
     if (option.value === valorInput) {
       const armamento = option.getAttribute("data-armamento");
       const casco = option.getAttribute("data-casco");
+      const chaleco = option.getAttribute("data-chaleco");
 
       const armamentoInput = document.getElementById(`${inputId}-armamento`);
       const cascoInput = document.getElementById(`${inputId}-casco`);
+      const chalecoInput = document.getElementById(`${inputId}-chaleco`);
       if (armamentoInput) armamentoInput.value = armamento || "";
       if (cascoInput) cascoInput.value = casco || "";
+      if (chalecoInput) chalecoInput.value = chaleco || "";
+
+      const chalecoVisible = document.getElementById(`chaleco-${inputId}`);
+      if (chalecoVisible) chalecoVisible.value = chaleco || "";
 
       if (infoBadge) {
-        infoBadge.innerHTML = `<span>Armamento: ${armamento || "Sin arma"}</span><span>Casco: ${casco || "Sin casco"}</span>`;
+        infoBadge.innerHTML = `<span>Armamento: ${armamento || "Sin arma"}</span><span>Casco: ${casco || "Sin casco"}</span><span>Chaleco: ${chaleco || "Sin chaleco"}</span>`;
         infoBadge.classList.remove("hidden");
       }
 
@@ -309,8 +320,13 @@ function autocompletarArmamento(inputId) {
     // Limpiar si no hay coincidencia
     const armamentoInput = document.getElementById(`${inputId}-armamento`);
     const cascoInput = document.getElementById(`${inputId}-casco`);
+    const chalecoInput = document.getElementById(`${inputId}-chaleco`);
     if (armamentoInput) armamentoInput.value = "";
     if (cascoInput) cascoInput.value = "";
+    if (chalecoInput) chalecoInput.value = "";
+
+    const chalecoVisible = document.getElementById(`chaleco-${inputId}`);
+    if (chalecoVisible) chalecoVisible.value = "";
   }
 }
 
@@ -397,6 +413,7 @@ function agregarAcompanante() {
       
       <input type="hidden" id="acomp${n}-armamento">
       <input type="hidden" id="acomp${n}-casco">
+      <input type="hidden" id="acomp${n}-chaleco">
       <input type="hidden" id="acomp${n}-externo" value="NO">
     </div>
   `;
@@ -779,11 +796,28 @@ function ocultarChalecosExternos() {
 }
 
 function sincronizarChalecos() {
+  // JP
+  const chalecoJpHidden = document.getElementById("jp-chaleco");
+  const chalecoJpVisible = document.getElementById("chaleco-jp");
+  if (chalecoJpHidden && chalecoJpVisible) chalecoJpVisible.value = chalecoJpHidden.value;
+
+  // Acompañante 1
+  const chalecoAcomp1Hidden = document.getElementById("acomp1-chaleco");
+  const chalecoAcomp1Visible = document.getElementById("chaleco-acomp1");
+  if (chalecoAcomp1Hidden && chalecoAcomp1Visible) chalecoAcomp1Visible.value = chalecoAcomp1Hidden.value;
+
+  // Acompañantes adicionales
   for (let i = 2; i <= contadorAcompanantes; i++) {
     const acompInput = document.getElementById(`acomp${i}`);
-    if (acompInput && !document.getElementById(`chaleco-acomp${i}`)) {
+    if (!acompInput || !acompInput.value.trim()) continue;
+
+    const chalecoHidden = document.getElementById(`acomp${i}-chaleco`);
+    let campoVisible = document.getElementById(`chaleco-acomp${i}`);
+    if (!campoVisible) {
       agregarCampoChalecoAdicional(i);
+      campoVisible = document.getElementById(`chaleco-acomp${i}`);
     }
+    if (campoVisible && chalecoHidden) campoVisible.value = chalecoHidden.value;
   }
 }
 
