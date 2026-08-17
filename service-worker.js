@@ -1,16 +1,18 @@
-const CACHE_NAME = "salidas-cache-v4.5";
+const CACHE_NAME = "salidas-cache-v4.6";
+// Rutas relativas para que funcionen en GitHub Pages tanto en raíz
+// (usuario.github.io) como en subcarpeta (usuario.github.io/repo)
 const urlsToCache = [
-  "/",
-  "/index.html",
-  "/app.js",
-  "/manifest.json",
-  "/images/logo2.png",
-  "/images/icon-192.png",
-  "/images/icon-512.png",
-  "/images/favicon.ico",
-  "/listado_funcionarios.json",
-  "/listado_vehiculos.json",
-  "/listado_equipamiento.json"
+  "./",
+  "./index.html",
+  "./app.js",
+  "./manifest.json",
+  "./images/logo2.png",
+  "./images/icon-192.png",
+  "./images/icon-512.png",
+  "./images/favicon.ico",
+  "./listado_funcionarios.json",
+  "./listado_vehiculos.json",
+  "./listado_equipamiento.json"
 ];
 
 // Instalación del service worker
@@ -19,7 +21,13 @@ self.addEventListener("install", event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log("Opened cache");
-        return cache.addAll(urlsToCache);
+        // Agregar cada recurso por separado para que el fallo de uno
+        // no impida que el service worker se actualice
+        return Promise.all(
+          urlsToCache.map(url =>
+            cache.add(url).catch(() => console.warn("No se pudo cachear:", url))
+          )
+        );
       })
       .then(() => {
         // Forzar la activación del nuevo service worker
@@ -49,8 +57,13 @@ self.addEventListener("activate", event => {
 
 // Estrategia de red: Network First con fallback a cache
 self.addEventListener("fetch", event => {
+  // Solo manejar peticiones GET del mismo origen
+  if (event.request.method !== "GET") return;
+  if (!event.request.url.startsWith(self.location.origin)) return;
+
   event.respondWith(
-    fetch(event.request)
+    // "no-store" evita que el caché HTTP del navegador entregue versiones viejas
+    fetch(new Request(event.request, { cache: "no-store" }))
       .then(response => {
         // Si la respuesta es válida, la guardamos en caché
         if (response.status === 200) {
@@ -70,9 +83,10 @@ self.addEventListener("fetch", event => {
               return response;
             }
             // Si no está en caché, devolvemos una página de error offline
-            if (event.request.destination === "document") {
-              return caches.match("/index.html");
+            if (event.request.mode === "navigate") {
+              return caches.match("./index.html");
             }
+            return new Response("", { status: 504, statusText: "Sin conexión" });
           });
       })
   );

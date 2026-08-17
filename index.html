@@ -799,7 +799,7 @@
     <datalist id="tipos-servicio"></datalist>
 
 
-    <script src="app.js?v=4.5"></script>
+    <script src="app.js?v=4.6"></script>
     <script>
         // Verificar que las funciones estén cargadas
         console.log('Verificando funciones...');
@@ -816,36 +816,37 @@
         }
     </script>
     <script>
-        // Service Worker Registration y Update Detection
+        // Service Worker Registration y Actualización Automática
         if ('serviceWorker' in navigator) {
             let refreshing = false;
-            let newWorker = null;
-            
-            // Detectar si la página se está recargando
+
+            // Si el service worker cambia de control, recargar para usar la versión nueva
             navigator.serviceWorker.addEventListener('controllerchange', () => {
                 if (refreshing) return;
                 refreshing = true;
                 window.location.reload();
             });
-            
+
             // Registrar el service worker
             navigator.serviceWorker.register('service-worker.js')
                 .then(registration => {
                     console.log('Service Worker registrado con éxito:', registration);
-                    
+
                     // Verificar si hay una actualización cada 30 segundos
                     setInterval(() => {
                         registration.update();
                     }, 30000);
-                    
-                    // Escuchar por nuevas versiones del service worker
+
+                    // Cuando se detecta una nueva versión, aplicarla AUTOMÁTICAMENTE
                     registration.addEventListener('updatefound', () => {
-                        newWorker = registration.installing;
-                        
+                        const newWorker = registration.installing;
+                        if (!newWorker) return;
+
                         newWorker.addEventListener('statechange', () => {
+                            // Si ya hay un service worker activo, activar el nuevo de inmediato
+                            // sin esperar confirmación del usuario
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                // Hay una nueva versión disponible
-                                mostrarNotificacionActualizacion();
+                                newWorker.postMessage({ type: 'SKIP_WAITING' });
                             }
                         });
                     });
@@ -853,77 +854,6 @@
                 .catch(error => {
                     console.error('Error al registrar el Service Worker:', error);
                 });
-        }
-        
-        function mostrarNotificacionActualizacion() {
-            // Crear una notificación no intrusiva
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #004080;
-                color: white;
-                padding: 16px 20px;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 10000;
-                max-width: 300px;
-                font-family: 'Inter', sans-serif;
-                font-size: 14px;
-                animation: slideIn 0.3s ease;
-            `;
-            
-            notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="font-size: 20px;">Actualización</div>
-                    <div>
-                        <div style="font-weight: 600; margin-bottom: 4px;">Nueva versión disponible</div>
-                        <div style="opacity: 0.9; font-size: 12px;">Hay una actualización con nuevas mejoras</div>
-                        <button onclick="aplicarActualizacion()" style="
-                            margin-top: 8px;
-                            background: white;
-                            color: #004080;
-                            border: none;
-                            padding: 6px 12px;
-                            border-radius: 6px;
-                            font-size: 12px;
-                            font-weight: 600;
-                            cursor: pointer;
-                        ">Actualizar ahora</button>
-                    </div>
-                </div>
-            `;
-            
-            // Agregar animación CSS
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            document.body.appendChild(notification);
-            
-            // Auto-ocultar después de 10 segundos
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.style.animation = 'slideIn 0.3s ease reverse';
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.remove();
-                        }
-                    }, 300);
-                }
-            }, 10000);
-        }
-        
-        function aplicarActualizacion() {
-            if (newWorker) {
-                newWorker.postMessage({ type: 'SKIP_WAITING' });
-            }
         }
     </script>
 </body>
