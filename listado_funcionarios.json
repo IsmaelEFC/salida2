@@ -23,7 +23,7 @@
   {
     "nombre": "Martín Muñoz Escobar",
     "grado": "Teniente",
-    "armamento": "TBX11772",
+    "armamento": "TBX11853",
     "casco": "71945",
     "chaleco": "2020123267"
   },
@@ -79,7 +79,7 @@
   {
     "nombre": "Cristóbal Barria Muñoz",
     "grado": "Suboficial",
-    "armamento": "TBX11853",
+    "armamento": "TBX13106",
     "casco": "71849",
     "chaleco": ""
   },
@@ -107,7 +107,7 @@
   {
     "nombre": "Carolina Norambuena Norambuena",
     "grado": "Suboficial",
-    "armamento": "TBX13106",
+    "armamento": "",
     "casco": "71842",
     "chaleco": ""
   },
@@ -233,7 +233,7 @@
   {
     "nombre": "Dante Ravanales Quiroz",
     "grado": "Cabo 1°",
-    "armamento": "TBX12297",
+    "armamento": "",
     "casco": "71703",
     "chaleco": ""
   },
