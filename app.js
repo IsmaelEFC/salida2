@@ -186,7 +186,7 @@ function mostrarCampoManualVehiculo() {
 // ─────────────────────────────────────────────
 
 function toggleExternoMode(inputId) {
-  if (inputId === 'radio') {
+  if (inputId === 'radio' || inputId.startsWith('radio')) {
     // Manejar modo externo para radio
     const input = document.getElementById(inputId);
     const externoHidden = document.getElementById(`${inputId}-externo`);
@@ -643,11 +643,30 @@ function enviarWhatsApp() {
   document.getElementById("preview-modal").classList.remove("hidden");
 }
 
+function abrirWhatsApp(mensaje) {
+  const url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+  // En PWAs instaladas (modo standalone) window.open suele ser bloqueado en móviles.
+  // Usar un <a target="_blank"> es más fiable y conserva el gesto del usuario.
+  try {
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { try { document.body.removeChild(a); } catch (e) {} }, 1000);
+  } catch (e) {
+    // Último recurso: navegar en la misma pestaña
+    window.location.href = url;
+  }
+}
+
 function confirmarEnvio() {
   const mensaje = document.getElementById("preview-texto").value.trim();
   if (!mensaje) return;
   guardarHistorial(mensaje);
-  window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, "_blank");
+  abrirWhatsApp(mensaje);
   cerrarPreview();
   mostrarToast("Salida enviada correctamente");
 }
@@ -867,7 +886,7 @@ function guardarTipoServicio(tipo) {
   const tipos = leerLocalStorage("tiposServicio");
   if (!tipos.includes(tipo.trim())) {
     tipos.unshift(tipo.trim());
-    if (tipos.length > 20) tipos = tipos.slice(0, 20);
+    if (tipos.length > 20) tipos.splice(20);
     localStorage.setItem("tiposServicio", JSON.stringify(tipos));
     cargarTiposServicio();
   }
@@ -877,13 +896,24 @@ function guardarTipoServicio(tipo) {
 // HISTORIAL DE SALIDAS
 // ─────────────────────────────────────────────
 
+function escaparHTML(texto) {
+  return String(texto ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function guardarHistorial(mensaje) {
   const entrada = {
     id: Date.now(),
     timestamp: new Date().toISOString(),
     fecha: document.getElementById("fecha").value,
     jp: document.getElementById("jp").value,
-    vehiculo: (document.getElementById("vehiculo")?.value || "").replace("MANUAL", document.getElementById("manual-vehiculo")?.value || ""),
+    vehiculo: (document.getElementById("vehiculo")?.value === "MANUAL"
+      ? (document.getElementById("manual-vehiculo")?.value || "")
+      : (document.getElementById("vehiculo")?.value || "")),
     tipo: document.getElementById("tipo").value,
     mensaje,
   };
@@ -909,9 +939,9 @@ function toggleHistorial() {
   } else {
     panel.innerHTML = entries.map(e => `
       <div class="historial-item" onclick="reenviarSalida(${e.id})">
-        <div class="historial-fecha">${e.fecha}</div>
-        <div class="historial-jp">${e.jp}</div>
-        <div class="historial-tipo">${e.tipo}</div>
+        <div class="historial-fecha">${escaparHTML(e.fecha)}</div>
+        <div class="historial-jp">${escaparHTML(e.jp)}</div>
+        <div class="historial-tipo">${escaparHTML(e.tipo)}</div>
       </div>
     `).join("");
   }
@@ -922,7 +952,7 @@ function reenviarSalida(id) {
   const entries = cargarHistorial();
   const entry = entries.find(e => e.id === id);
   if (entry) {
-    window.open(`https://wa.me/?text=${encodeURIComponent(entry.mensaje)}`, "_blank");
+    abrirWhatsApp(entry.mensaje);
   }
 }
 

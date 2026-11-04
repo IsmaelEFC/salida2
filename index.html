@@ -18,6 +18,7 @@
     <meta name="apple-mobile-web-app-title" content="Control de Salidas">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
     <style>
         * {
             margin: 0;
@@ -515,6 +516,34 @@
         .historial-fecha { font-size: 12px; color: var(--text-secondary); }
         .historial-jp { font-weight: 600; font-size: 14px; }
         .historial-tipo { font-size: 12px; color: var(--accent); font-weight: 500; }
+
+        /* ── Adaptabilidad móvil ── */
+        @media (max-width: 480px) {
+            body { padding: 12px 6px; }
+            .container { padding: 20px 14px; border-radius: 16px; }
+            .header { margin-bottom: 20px; }
+            .logo-img { width: 88px; height: 88px; }
+            h1 { font-size: 20px; }
+            .subtitle { font-size: 14px; }
+            .section-title { margin: 24px 0 12px; font-size: 13px; }
+            .grid-2 { grid-template-columns: 1fr; gap: 12px; }
+            input, select, textarea { font-size: 16px; padding: 10px 12px; }
+            .btn-whatsapp { padding: 14px; font-size: 15px; }
+            .btn-secondary { padding: 10px 16px; font-size: 13px; }
+            .modal-content { padding: 20px 16px; border-radius: 16px; }
+            .modal-body { font-size: 12px; padding: 12px; }
+            .toggle-btn { padding: 10px 12px; font-size: 13px; }
+            .input-row { flex-wrap: wrap; }
+            .btn-externo { width: 100%; }
+        }
+        @media (max-width: 360px) {
+            .container { padding: 16px 10px; }
+            .logo-img { width: 72px; height: 72px; }
+            h1 { font-size: 18px; }
+        }
+        /* Evitar zoom en iOS al enfocar inputs (ya 16px) y mejorar tap targets */
+        button, .toggle-btn, .btn-externo { min-height: 44px; }
+        input, select { min-height: 44px; }
     </style>
 </head>
 
@@ -570,7 +599,7 @@
                 </div>
                 <div class="grid-2">
                     <div class="form-group">
-                        <label for="km">Kilometraje Actual</label>
+                        <label for="km">Kilometraje Actual <span class="required">*</span></label>
                         <input type="number" id="km" min="0" placeholder="Ej: 45000">
                     </div>
                     <div class="form-group">
@@ -799,7 +828,7 @@
     <datalist id="tipos-servicio"></datalist>
 
 
-    <script src="app.js?v=4.6"></script>
+    <script src="app.js?v=4.7"></script>
     <script>
         // Verificar que las funciones estén cargadas
         console.log('Verificando funciones...');

@@ -1,4 +1,4 @@
-const CACHE_NAME = "salidas-cache-v4.6";
+const CACHE_NAME = "salidas-cache-v4.7";
 // Rutas relativas para que funcionen en GitHub Pages tanto en raíz
 // (usuario.github.io) como en subcarpeta (usuario.github.io/repo)
 const urlsToCache = [
@@ -61,27 +61,35 @@ self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
   if (!event.request.url.startsWith(self.location.origin)) return;
 
+  // Normalizar la URL quitando parámetros de query (ej. app.js?v=4.7)
+  // para que el caché funcione aunque cambie la versión del query string.
+  const urlNormalizada = new URL(event.request.url);
+  urlNormalizada.search = "";
+  const requestNormalizado = new Request(urlNormalizada.toString(), { method: "GET" });
+
   event.respondWith(
     // "no-store" evita que el caché HTTP del navegador entregue versiones viejas
     fetch(new Request(event.request, { cache: "no-store" }))
       .then(response => {
-        // Si la respuesta es válida, la guardamos en caché
+        // Si la respuesta es válida, la guardamos en caché con la URL normalizada
         if (response.status === 200) {
           const responseClone = response.clone();
           caches.open(CACHE_NAME)
             .then(cache => {
-              cache.put(event.request, responseClone);
+              cache.put(requestNormalizado, responseClone);
             });
         }
         return response;
       })
       .catch(() => {
-        // Si la red falla, buscamos en caché
-        return caches.match(event.request)
+        // Si la red falla, buscamos en caché (por URL normalizada y original)
+        return caches.match(requestNormalizado)
           .then(response => {
-            if (response) {
-              return response;
-            }
+            if (response) return response;
+            return caches.match(event.request);
+          })
+          .then(response => {
+            if (response) return response;
             // Si no está en caché, devolvemos una página de error offline
             if (event.request.mode === "navigate") {
               return caches.match("./index.html");
